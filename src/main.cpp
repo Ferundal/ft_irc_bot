@@ -1,8 +1,5 @@
-const char* GLOBAL_PASS;
-
 #include "Bot.hpp"
 #include "IRC_Connection.hpp"
-#include "IRC_Message.hpp"
 
 #include <iostream>
 
@@ -21,7 +18,7 @@ int main(int argc,const char **argv) {
 	try {
 		IRC_Connection connection;
 		connection.EstablishConnection(argv[3], argv[4]);
-		Bot bot(argv[3], argv[4], connection);
+		Bot bot(argv[1], argv[2], connection);
 		if (argc < 6)
 			bot.Login(NULL);
 		else

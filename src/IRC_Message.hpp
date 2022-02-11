@@ -21,5 +21,5 @@ public:
 	void Parcer(std::string message);
 };
 
-
+std::ostream &operator <<(std::ostream &outstream, const IRC_Message &origin);
 #endif //FT_IRC_BOT_COMMAND_HPP

@@ -22,7 +22,7 @@ int UserStore::JoinChannel(IRC_Message &message) {
 	User *user_ptr = this->FindUserByNick(message._sender);
 	if (user_ptr == NULL)
 		return (ERR_NOT_A_BOT_USER);
-	if (!user_ptr->JoinChannel(message._args[1]))
+	if (user_ptr->JoinChannel(message._args[1]))
 		return (ERR_ALREADY_ON_CHANNEL);
 	return (0);
 }

@@ -2,6 +2,7 @@
 // Created by ferun on 10.02.2022.
 //
 
+/*
 #include "IRC_Message.hpp"
 #include "iostream"
 
@@ -16,4 +17,4 @@ int main() {
 	if (!message._tail_message.empty())
 		std::cout << "TAIL->" << message._tail_message << std::endl;
 	std::cout << std::endl;
-}
+}*/

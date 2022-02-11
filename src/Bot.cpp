@@ -12,7 +12,7 @@ Bot::Bot(const char *bot_nick, const char *bot_password, IRC_Connection &connect
 void Bot::Login(const char *server_password) {
 	std::string command;
 	if (server_password != NULL) {
-		command = command + "PASS " + server_password;
+		command = command + "PASS :" + server_password;
 		_connection.SendIRC_Command(command);
 		command.clear();
 	}
@@ -28,7 +28,7 @@ void Bot::Login(const char *server_password) {
 	if (!_message._is_correct || _message._command != CODE_TO_STRING(RPL_MOTD))
 		throw LoginExeption();
 	_connection.GetMessage(_message);
-	while (!_message._is_correct || _message._command != CODE_TO_STRING(RPL_MOTD))
+	while (!_message._is_correct || _message._command == CODE_TO_STRING(RPL_MOTD))
 		_connection.GetMessage(_message);
 	if (!_message._is_correct || _message._command != CODE_TO_STRING(RPL_ENDOFMOTD))
 		throw LoginExeption();
@@ -40,42 +40,41 @@ void Bot::Start() {
 	int				status;
 	while (_message._is_correct) {
 		if (_message._command == "PRIVMSG") {
+			std::cout << "Input->" <<_message << std::endl;
 			status = this->_user_store.AddNewUser(_message);
 			if (status == ERR_WRONG_BOT_PASS) {
 				command += "PRIVMSG " + _message._sender + " :Wrong bot password";
 				_connection.SendIRC_Command(command);
 				command.clear();
-				continue;
+			} else {
+				command += "PRIVMSG " + _message._sender + " :" +
+						   _message._sender + " can invite bot to channel";
+				_connection.SendIRC_Command(command);
+				command.clear();
 			}
-			command += "PRIVMSG " + _message._sender + " :" + _message._sender + " can invite bot to channel";
-			_connection.SendIRC_Command(command);
-			command.clear();
-		}
-		if (_message._command == "INVITE") {
+		} else if (_message._command == "INVITE") {
+			std::cout << "Input->" <<_message << std::endl;
 			status = this->_user_store.JoinChannel(_message);
 			if (status == ERR_NOT_A_BOT_USER) {
 				command += "PRIVMSG " + _message._sender + " :Not a bot user";
 				_connection.SendIRC_Command(command);
 				command.clear();
-				continue;
-			}
-			if (status == ERR_ALREADY_ON_CHANNEL) {
+			} else if (status == ERR_ALREADY_ON_CHANNEL) {
 				command += "PRIVMSG " + _message._sender + " :Bot already on channel";
 				_connection.SendIRC_Command(command);
 				command.clear();
-				continue;
+			} else {
+				command += "JOIN " + _message._args[1];
+				_connection.SendIRC_Command(command);
+				command.clear();
 			}
-			command += "JOIN " + _message._args[1];
-			_connection.SendIRC_Command(command);
-			command.clear();
-		}
-		if (_message._command == "JOIN") {
+		} else if (_message._command == "JOIN") {
 			if (this->_user_store.IsTryGiveRights(_message)) {
+				std::cout << "Input->" <<_message << std::endl;
 				command += "MODE " + _message._args[0] + " +o " + _message._sender;
 				_connection.SendIRC_Command(command);
 				command.clear();
 			}
-			continue;
 		}
 		_connection.GetMessage(_message);
 	}

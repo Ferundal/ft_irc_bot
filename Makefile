@@ -81,7 +81,7 @@ CC=					clang++
 RM=					rm -f
 LD=					ld
 
-ALL_CFLAGS=			-Wall -Wextra -Werror -std=c++98 ${CFLAGS}
+ALL_CFLAGS=			-Wall -Wextra -Werror -std=c++98 -g ${CFLAGS}
 ALL_LDFLAGS=		${LDFLAGS}
 
 NORM=				norminette ${NORMO}
