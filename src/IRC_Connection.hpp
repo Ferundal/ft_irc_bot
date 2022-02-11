@@ -4,17 +4,24 @@
 
 #ifndef FT_IRC_BOT_IRC_CONNECTION_HPP
 #define FT_IRC_BOT_IRC_CONNECTION_HPP
+
+#include <netinet/in.h>
+#include <cstring>
+#include <arpa/inet.h>
 #include "IRC_Message.hpp"
 
+#include <cstdlib>
 #include "sys/socket.h"
 #include "string"
 
 class IRC_Connection {
 private:
-	int			_socket;
+	int			_socket_fd;
+	sockaddr_in	_socket_info;
 public:
 	IRC_Connection();
-	void EstablishConnection(std::string server_host, std::string server_port);
+	void EstablishConnection(const char *server_host,
+							 const char *server_port);
 	void SendIRC_Command(std::string &command);
 	void GetMessage(IRC_Message &message_to_fill);
 	class SoketExeption : public std::exception {

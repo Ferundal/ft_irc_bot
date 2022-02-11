@@ -32,7 +32,7 @@ CPP_FILES_BONUS=
 
 #Classes's names should be placed here
 
-CLASSES=			Bot IRC_Connection IRC_Command
+CLASSES=			Bot IRC_Connection IRC_Message User UserStore
 
 CLASSES_BONUS=
 

@@ -4,8 +4,10 @@
 
 #include "Bot.hpp"
 
-Bot::Bot(const char *bot_nick, const char *bot_password,
-		 IRC_Connection &connection) : _bot_nick(bot_nick), _bot_password(bot_password), _connection(connection) {}
+Bot::Bot(const char *bot_nick, const char *bot_password, IRC_Connection &connection) :
+			_bot_nick(bot_nick),
+			_connection(connection),
+			_user_store(bot_password) {}
 
 void Bot::Login(const char *server_password) {
 	std::string command;
@@ -33,15 +35,49 @@ void Bot::Login(const char *server_password) {
 }
 
 void Bot::Start() {
-	std::string command;
+	std::string		command;
 	_connection.GetMessage(_message);
+	int				status;
 	while (_message._is_correct) {
-		if (_message._command == "PRIVMSG")
-
-				command = command + "PRIVMSG " + _message._sender + " :";
+		if (_message._command == "PRIVMSG") {
+			status = this->_user_store.AddNewUser(_message);
+			if (status == ERR_WRONG_BOT_PASS) {
+				command += "PRIVMSG " + _message._sender + " :Wrong bot password";
+				_connection.SendIRC_Command(command);
+				command.clear();
+				continue;
 			}
+			command += "PRIVMSG " + _message._sender + " :" + _message._sender + " can invite bot to channel";
+			_connection.SendIRC_Command(command);
+			command.clear();
 		}
-		this->_connection.GetMessage(_message);
+		if (_message._command == "INVITE") {
+			status = this->_user_store.JoinChannel(_message);
+			if (status == ERR_NOT_A_BOT_USER) {
+				command += "PRIVMSG " + _message._sender + " :Not a bot user";
+				_connection.SendIRC_Command(command);
+				command.clear();
+				continue;
+			}
+			if (status == ERR_ALREADY_ON_CHANNEL) {
+				command += "PRIVMSG " + _message._sender + " :Bot already on channel";
+				_connection.SendIRC_Command(command);
+				command.clear();
+				continue;
+			}
+			command += "JOIN " + _message._args[1];
+			_connection.SendIRC_Command(command);
+			command.clear();
+		}
+		if (_message._command == "JOIN") {
+			if (this->_user_store.IsTryGiveRights(_message)) {
+				command += "MODE " + _message._args[0] + " +o " + _message._sender;
+				_connection.SendIRC_Command(command);
+				command.clear();
+			}
+			continue;
+		}
+		_connection.GetMessage(_message);
 	}
 	throw UnknownMessageFormat();
 }

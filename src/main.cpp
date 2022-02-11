@@ -4,7 +4,6 @@ const char* GLOBAL_PASS;
 #include "IRC_Connection.hpp"
 #include "IRC_Message.hpp"
 
-#include <cstdlib>
 #include <iostream>
 
 int check_arg(int argc,const char **argv) {
