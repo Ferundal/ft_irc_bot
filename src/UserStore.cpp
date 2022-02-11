@@ -4,9 +4,7 @@
 
 #include "UserStore.hpp"
 
-UserStore::UserStore(const char *bot_password) : _bot_password(bot_password) {
-
-}
+UserStore::UserStore(const char *bot_password) : _bot_password(bot_password) {}
 
 int UserStore::AddNewUser(IRC_Message &message) {
 	if (message._tail_message != _bot_password)
